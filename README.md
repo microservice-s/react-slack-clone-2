@@ -1,3 +1,3 @@
 # A Slack Chat App Clone using React
 
-Following tutorial from Udemy [link to tutorial](https://github.com/riceball1/react-slack-clone.git)
+Following tutorial from Udemy [link to tutorial](https://www.udemy.com/build-a-slack-chat-app-with-react-redux-and-firebase/)
