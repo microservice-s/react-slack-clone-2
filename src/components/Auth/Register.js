@@ -11,7 +11,8 @@ export default class Register extends Component {
     password: '',
     passwordConfirmation: '',
     errors: [],
-    loading: false
+    loading: false,
+    usersRef: firebase.database().ref('users')
   }
 
   isFormValidation = values => {
@@ -68,7 +69,9 @@ export default class Register extends Component {
             photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
           })
           .then(() => {
-            this.setState({loading: false})
+            this.saveUser(createdUser).then(() => {
+              console.log('saved user')
+            })
           })
           .catch(err => {
             console.error(err)
@@ -80,6 +83,14 @@ export default class Register extends Component {
           this.setState({errors: this.state.errors.concat(err), loading: false})
         })
     }
+  }
+
+  saveUser = createdUser => {
+    // usersRef references all the collection of users that user will be added to
+    return this.state.usersRef.child(createdUser.user.uid).set({
+      name: createdUser.user.displayName,
+      avatar: createdUser.user.photoURL
+    })
   }
 
   handleInputError = (errors, inputName) => {
