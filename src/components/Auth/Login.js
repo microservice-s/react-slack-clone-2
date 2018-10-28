@@ -11,7 +11,6 @@ export default class Login extends Component {
     loading: false
   }
 
-
   displayErrors = errors => errors.map((error, i) => <p key={i}>{error.message}</p>)
 
   handleChange = event => {
