@@ -5,7 +5,7 @@ import { Grid, Header, Icon, Dropdown } from 'semantic-ui-react';
 
 class UserPanel extends Component {
   state={
-    user: this.props.currentUser? this.props.currentUser.displayName : 'user'
+    user: this.props.currentUser.displayName
   }
 
   dropdownOptions = () => [
@@ -33,6 +33,7 @@ class UserPanel extends Component {
   )
 
   render() {
+    console.log(this.state)
     return (
       <Grid style={{ background: '#4c3c4c'}}>
         <Grid.Column>
@@ -57,7 +58,7 @@ class UserPanel extends Component {
 }
 
 const mapStateToProps = state => ({
-  user: state.user && state.user.currentUser
+  currentUser: state.user.currentUser
 })
 
 export default connect(mapStateToProps)(UserPanel)
