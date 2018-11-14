@@ -12,6 +12,31 @@ export default class Channels extends Component {
     isModalOpen: false
   }
 
+  componentDidMount() {
+    this.addListeners();
+  }
+
+  addListeners = () => {
+    let loadedChannels = [];
+    this.state.channelsRef.on('child_added', snap => {
+      loadedChannels.push(snap.val());
+      this.setState({channels: loadedChannels});
+    })
+  }
+
+  displayChannels = channels => {
+    return channels.length > 0 && channels.map(channel => (
+      <Menu.Item 
+        key={channel.id}
+        onClick={() => console.log(channel)}
+        name={channel.name}
+        style={{opacity: 0.7}}
+        >
+        # {channel.name}
+      </Menu.Item>
+    ))
+  }
+
   addChannel = () => {
     const { channelsRef, channelName, channelDetails, user} = this.state;
     const key = channelsRef.push().key; // unique key
@@ -67,7 +92,7 @@ export default class Channels extends Component {
           ({channels.length}) <Icon name="add" onClick={this.openModal}/>
         </Menu.Item>
         {/* channels */}
-
+        {this.displayChannels(channels)}
         {/* modal to add channels */}
         <Modal basic open={isModalOpen} onClose={this.closeModal}>
           <Modal.Header>Add Channel</Modal.Header>
