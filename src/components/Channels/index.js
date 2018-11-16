@@ -1,15 +1,21 @@
 import React, { Component } from 'react';
 import firebase from '../../firebase';
+import { connect } from 'react-redux';
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react';
 
-export default class Channels extends Component {
+// Actions
+import { setCurrentChannel } from '../../actions';
+
+class Channels extends Component {
   state={
     user: this.props.currentUser,
     channels: [],
     channelName: '',
     channelDetails: '',
     channelsRef: firebase.database().ref('channels'),
-    isModalOpen: false
+    isModalOpen: false,
+    firstLoad: true,
+    activeChannel: ''
   }
 
   componentDidMount() {
@@ -20,17 +26,41 @@ export default class Channels extends Component {
     let loadedChannels = [];
     this.state.channelsRef.on('child_added', snap => {
       loadedChannels.push(snap.val());
-      this.setState({channels: loadedChannels});
+      this.setState({channels: loadedChannels}, () => this.setFirstChannel());
     })
+  }
+
+  removeListeners = () => { // not listening for events that doesn't take place
+    this.state.channelsRef.off();
+  }
+
+  setFirstChannel = () => {
+    const firstChannel = this.state.channels[0];
+    if (this.state.firstLoad && this.state.channels.length > 0) { // on first load and there are at least 1 channel
+      this.props.setCurrentChannel(firstChannel);
+      this.setActiveChannel(firstChannel)
+    }
+    this.setState({ firstLoad: false });
+  }
+
+  changeChannel = channel => {
+    this.setActiveChannel(channel)
+    // add channel data and set it to global state
+    this.props.setCurrentChannel(channel);
+  }
+
+  setActiveChannel = channel => {
+    this.setState({activeChannel: channel.id});
   }
 
   displayChannels = channels => {
     return channels.length > 0 && channels.map(channel => (
       <Menu.Item 
         key={channel.id}
-        onClick={() => console.log(channel)}
+        onClick={() => this.changeChannel(channel)}
         name={channel.name}
         style={{opacity: 0.7}}
+        active={channel.id === this.state.activeChannel}
         >
         # {channel.name}
       </Menu.Item>
@@ -79,6 +109,7 @@ export default class Channels extends Component {
   handleChange = event => this.setState({
     [event.target.name]: event.target.value
   });
+
 
   render() {
     const {channels, isModalOpen} = this.state;
@@ -131,3 +162,11 @@ export default class Channels extends Component {
     )
   }
 }
+// This way you have to explicitly set dispatch
+// const mapDispatchToProps = dispatch  => {
+//   return {
+//     setCurrentChannel: () => dispatch(setCurrentChannel)
+//   }
+// }
+
+export default connect(null, { setCurrentChannel } )(Channels)
